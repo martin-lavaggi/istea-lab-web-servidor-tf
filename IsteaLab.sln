@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Products.Domain", "src\Prod
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Products.Infrastructure", "src\Products\Products.Infrastructure\Products.Infrastructure.csproj", "{30A6B23A-A5BB-4119-830E-67AC44B3D9E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Products.Application", "src\Products\Products.Application\Products.Application.csproj", "{9F2AED18-F2C3-4739-B0B5-A0A24024AA9E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,10 +30,15 @@ Global
 		{30A6B23A-A5BB-4119-830E-67AC44B3D9E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30A6B23A-A5BB-4119-830E-67AC44B3D9E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30A6B23A-A5BB-4119-830E-67AC44B3D9E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F2AED18-F2C3-4739-B0B5-A0A24024AA9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F2AED18-F2C3-4739-B0B5-A0A24024AA9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F2AED18-F2C3-4739-B0B5-A0A24024AA9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F2AED18-F2C3-4739-B0B5-A0A24024AA9E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{DFDE1C31-0D98-47B0-9453-A4DBA6EBC88F} = {AE90D3E9-8807-42F2-BED0-B9E841140D2E}
 		{8A536D9A-B46A-4825-A919-41668E648865} = {DFDE1C31-0D98-47B0-9453-A4DBA6EBC88F}
 		{30A6B23A-A5BB-4119-830E-67AC44B3D9E4} = {DFDE1C31-0D98-47B0-9453-A4DBA6EBC88F}
+		{9F2AED18-F2C3-4739-B0B5-A0A24024AA9E} = {DFDE1C31-0D98-47B0-9453-A4DBA6EBC88F}
 	EndGlobalSection
 EndGlobal
