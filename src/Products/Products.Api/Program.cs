@@ -7,8 +7,15 @@ using Products.Domain.Models.Entities;
 using Products.Domain.Repositories;
 using Products.Infrastructure.Data;
 using Products.Infrastructure.Repositories;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.File("logs/products.log")
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog();
 
 // Connection string
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
