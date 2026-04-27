@@ -47,7 +47,7 @@ public class CustomerRepository : ICustomerRepository
         existing.Name = customer.Name;
         existing.Email = customer.Email;
         existing.Address = customer.Address;
-        existing.RegistrationDate = customer.RegistrationDate;
+        // RegistrationDate no se modifica: representa la fecha de creación del registro.
 
         await _context.SaveChangesAsync();
         return existing;
