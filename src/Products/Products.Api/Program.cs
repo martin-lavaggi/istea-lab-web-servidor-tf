@@ -27,7 +27,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Repository
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
-// AutoMapper (escanea Application y Api)
+// AutoMapper escanea los profiles tanto del proyecto Api (DTOs de entrada)
+// como del proyecto Application (DTOs de salida).
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddMaps(typeof(Program).Assembly, typeof(ProductProfile).Assembly);

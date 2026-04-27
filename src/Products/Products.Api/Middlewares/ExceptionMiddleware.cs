@@ -1,5 +1,9 @@
 namespace Products.Api.Middlewares;
 
+/// <summary>
+/// Captura las excepciones no manejadas del pipeline, las loguea y devuelve 500
+/// con un cuerpo JSON estructurado al cliente.
+/// </summary>
 public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;

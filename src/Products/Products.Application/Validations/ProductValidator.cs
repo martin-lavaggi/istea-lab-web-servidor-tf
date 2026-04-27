@@ -3,6 +3,9 @@ using Products.Domain.Models.Entities;
 
 namespace Products.Application.Validations;
 
+/// <summary>
+/// Reglas de validación de la entidad Product. El controller la ejecuta antes de Create y Update.
+/// </summary>
 public class ProductValidator : AbstractValidator<Product>
 {
     public ProductValidator()

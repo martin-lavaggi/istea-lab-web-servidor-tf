@@ -5,6 +5,9 @@ using Products.Infrastructure.Data;
 
 namespace Products.Infrastructure.Repositories;
 
+/// <summary>
+/// Implementación de IProductRepository sobre Entity Framework Core y SQL Server.
+/// </summary>
 public class ProductRepository : IProductRepository
 {
     private readonly ApplicationDbContext _context;

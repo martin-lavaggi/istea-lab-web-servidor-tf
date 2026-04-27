@@ -8,6 +8,9 @@ using Products.Domain.Repositories;
 
 namespace Products.Api.Controllers;
 
+/// <summary>
+/// Controller REST del microservicio Products. Expone los 5 endpoints CRUD.
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class ProductController : ControllerBase
