@@ -1,0 +1,154 @@
+@page "/products"
+@using Web.Client.Models
+@using Web.Client.Services
+@inject ProductsApiClient Api
+@inject IJSRuntime JS
+
+<PageTitle>Productos</PageTitle>
+
+<h1>Productos</h1>
+
+<p>@mensaje</p>
+
+<button class="btn btn-primary" @onclick="StartCreate">Nuevo</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in productos)
+        {
+            <tr>
+                <td>@p.Name</td>
+                <td>@p.Description</td>
+                <td>@p.Price</td>
+                <td>@p.Quantity</td>
+                <td>
+                    <button class="btn btn-sm btn-secondary" @onclick="() => StartEdit(p)">Editar</button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => Delete(p.Id)">Borrar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (editing != null)
+{
+    @if (editing.Id == 0)
+    {
+        <h2>Nuevo producto</h2>
+    }
+    else
+    {
+        <h2>Editar producto</h2>
+    }
+    <div>
+        <label>Nombre: <input @bind="editing.Name" /></label>
+    </div>
+    <div>
+        <label>Descripción: <input @bind="editing.Description" /></label>
+    </div>
+    <div>
+        <label>Precio: <input type="number" @bind="editing.Price" /></label>
+    </div>
+    <div>
+        <label>Stock: <input type="number" @bind="editing.Quantity" /></label>
+    </div>
+    <button class="btn btn-primary" @onclick="Save">Guardar</button>
+    <button class="btn btn-secondary" @onclick="Cancel">Cancelar</button>
+}
+
+@code {
+    private List<ProductDto> productos = new();
+    private ProductDto? editing;
+    private string? mensaje;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            productos = await Api.GetAllAsync();
+        }
+        catch
+        {
+            mensaje = "Error al cargar productos.";
+        }
+    }
+
+    private void StartCreate()
+    {
+        editing = new ProductDto();
+        mensaje = null;
+    }
+
+    private void StartEdit(ProductDto p)
+    {
+        editing = new ProductDto
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Description = p.Description,
+            Price = p.Price,
+            Quantity = p.Quantity
+        };
+        mensaje = null;
+    }
+
+    private void Cancel()
+    {
+        editing = null;
+        mensaje = null;
+    }
+
+    private async Task Save()
+    {
+        if (editing == null)
+        {
+            return;
+        }
+        try
+        {
+            if (editing.Id == 0)
+            {
+                await Api.CreateAsync(editing);
+            }
+            else
+            {
+                await Api.UpdateAsync(editing.Id, editing);
+            }
+            editing = null;
+            productos = await Api.GetAllAsync();
+            mensaje = "Producto guardado.";
+        }
+        catch
+        {
+            mensaje = "Error al guardar.";
+        }
+    }
+
+    private async Task Delete(int id)
+    {
+        var confirmar = await JS.InvokeAsync<bool>("confirm", "¿Eliminar este producto?");
+        if (!confirmar)
+        {
+            return;
+        }
+        try
+        {
+            await Api.DeleteAsync(id);
+            productos = await Api.GetAllAsync();
+            mensaje = "Producto eliminado.";
+        }
+        catch
+        {
+            mensaje = "Error al eliminar.";
+        }
+    }
+}
