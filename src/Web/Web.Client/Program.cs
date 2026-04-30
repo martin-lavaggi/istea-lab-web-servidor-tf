@@ -17,4 +17,14 @@ builder.Services.AddHttpClient<ProductsApiClient>(client =>
     client.BaseAddress = new Uri(productsApiUrl);
 });
 
+var customersApiUrl = builder.Configuration["Services:CustomersApi"];
+if (customersApiUrl == null)
+{
+    throw new InvalidOperationException("Falta la URL 'Services:CustomersApi' en appsettings.json.");
+}
+builder.Services.AddHttpClient<CustomersApiClient>(client =>
+{
+    client.BaseAddress = new Uri(customersApiUrl);
+});
+
 await builder.Build().RunAsync();

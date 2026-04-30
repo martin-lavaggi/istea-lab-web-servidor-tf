@@ -1,0 +1,172 @@
+@page "/customers"
+@using Web.Client.Models
+@using Web.Client.Services
+@inject CustomersApiClient Api
+@inject IJSRuntime JS
+
+<PageTitle>Clientes</PageTitle>
+
+<h1>Clientes</h1>
+
+<p>@mensaje</p>
+
+<button class="btn btn-primary" @onclick="StartCreate">Nuevo</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Calle</th>
+            <th>Ciudad</th>
+            <th>Estado</th>
+            <th>CP</th>
+            <th>Fecha registro</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in clientes)
+        {
+            <tr>
+                <td>@c.Name</td>
+                <td>@c.Email</td>
+                <td>@c.Address.Street</td>
+                <td>@c.Address.City</td>
+                <td>@c.Address.State</td>
+                <td>@c.Address.ZipCode</td>
+                <td>@c.RegistrationDate.ToString("dd/MM/yyyy")</td>
+                <td>
+                    <button class="btn btn-sm btn-secondary" @onclick="() => StartEdit(c)">Editar</button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => Delete(c.Id)">Borrar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (editing != null)
+{
+    @if (editing.Id == 0)
+    {
+        <h2>Nuevo cliente</h2>
+    }
+    else
+    {
+        <h2>Editar cliente</h2>
+    }
+    <div>
+        <label>Nombre: <input @bind="editing.Name" /></label>
+    </div>
+    <div>
+        <label>Email: <input type="email" @bind="editing.Email" /></label>
+    </div>
+    <div>
+        <label>Calle: <input @bind="editing.Address.Street" /></label>
+    </div>
+    <div>
+        <label>Ciudad: <input @bind="editing.Address.City" /></label>
+    </div>
+    <div>
+        <label>Estado: <input @bind="editing.Address.State" /></label>
+    </div>
+    <div>
+        <label>Código Postal: <input @bind="editing.Address.ZipCode" /></label>
+    </div>
+    <button class="btn btn-primary" @onclick="Save">Guardar</button>
+    <button class="btn btn-secondary" @onclick="Cancel">Cancelar</button>
+}
+
+@code {
+    private List<CustomerDto> clientes = new();
+    private CustomerDto? editing;
+    private string? mensaje;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            clientes = await Api.GetAllAsync();
+        }
+        catch
+        {
+            mensaje = "Error al cargar clientes.";
+        }
+    }
+
+    private void StartCreate()
+    {
+        editing = new CustomerDto();
+        mensaje = null;
+    }
+
+    private void StartEdit(CustomerDto c)
+    {
+        editing = new CustomerDto
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Email = c.Email,
+            Address = new Address
+            {
+                Street = c.Address.Street,
+                City = c.Address.City,
+                State = c.Address.State,
+                ZipCode = c.Address.ZipCode
+            },
+            RegistrationDate = c.RegistrationDate
+        };
+        mensaje = null;
+    }
+
+    private void Cancel()
+    {
+        editing = null;
+        mensaje = null;
+    }
+
+    private async Task Save()
+    {
+        if (editing == null)
+        {
+            return;
+        }
+        try
+        {
+            if (editing.Id == 0)
+            {
+                await Api.CreateAsync(editing);
+            }
+            else
+            {
+                await Api.UpdateAsync(editing.Id, editing);
+            }
+            editing = null;
+            clientes = await Api.GetAllAsync();
+            mensaje = "Cliente guardado.";
+        }
+        catch
+        {
+            mensaje = "Error al guardar.";
+        }
+    }
+
+    private async Task Delete(int id)
+    {
+        var confirmar = await JS.InvokeAsync<bool>("confirm", "¿Eliminar este cliente?");
+        if (!confirmar)
+        {
+            return;
+        }
+        try
+        {
+            await Api.DeleteAsync(id);
+            clientes = await Api.GetAllAsync();
+            mensaje = "Cliente eliminado.";
+        }
+        catch
+        {
+            mensaje = "Error al eliminar.";
+        }
+    }
+}
