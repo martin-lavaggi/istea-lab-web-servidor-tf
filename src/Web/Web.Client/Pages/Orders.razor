@@ -1,0 +1,132 @@
+@page "/orders"
+@using Web.Client.Models
+@using Web.Client.Services
+@inject OrdersApiClient OrdersApi
+@inject ProductsApiClient ProductsApi
+@inject CustomersApiClient CustomersApi
+
+<PageTitle>Órdenes</PageTitle>
+
+<h1>Órdenes</h1>
+
+<p>@mensaje</p>
+
+<button class="btn btn-primary" @onclick="StartCreate">Nuevo</button>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Cliente</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Total</th>
+            <th>Fecha</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var o in ordenes)
+        {
+            <tr>
+                <td>@o.CustomerName</td>
+                <td>@o.Items[0].ProductName</td>
+                <td>@o.Items[0].Quantity</td>
+                <td>@o.Total</td>
+                <td>@o.OrderDate.ToString("dd/MM/yyyy")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (creating)
+{
+    <h2>Nueva orden</h2>
+    <div>
+        <label>Cliente:
+            <select @bind="selectedCustomerId">
+                <option value="0">-- Seleccionar --</option>
+                @foreach (var c in clientes)
+                {
+                    <option value="@c.Id">@c.Name</option>
+                }
+            </select>
+        </label>
+    </div>
+    <div>
+        <label>Producto:
+            <select @bind="selectedProductId">
+                <option value="0">-- Seleccionar --</option>
+                @foreach (var p in productos)
+                {
+                    <option value="@p.Id">@p.Name</option>
+                }
+            </select>
+        </label>
+    </div>
+    <div>
+        <label>Cantidad: <input type="number" @bind="quantity" /></label>
+    </div>
+    <button class="btn btn-primary" @onclick="Save">Guardar</button>
+    <button class="btn btn-secondary" @onclick="Cancel">Cancelar</button>
+}
+
+@code {
+    private List<OrderDto> ordenes = new();
+    private List<ProductDto> productos = new();
+    private List<CustomerDto> clientes = new();
+    private bool creating;
+    private int selectedCustomerId;
+    private int selectedProductId;
+    private int quantity = 1;
+    private string? mensaje;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            ordenes = await OrdersApi.GetAllAsync();
+            productos = await ProductsApi.GetAllAsync();
+            clientes = await CustomersApi.GetAllAsync();
+        }
+        catch
+        {
+            mensaje = "Error al cargar datos.";
+        }
+    }
+
+    private void StartCreate()
+    {
+        creating = true;
+        selectedCustomerId = 0;
+        selectedProductId = 0;
+        quantity = 1;
+        mensaje = null;
+    }
+
+    private void Cancel()
+    {
+        creating = false;
+        mensaje = null;
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            var request = new OrderRequest(
+                selectedCustomerId,
+                new List<OrderItemRequest>
+                {
+                    new OrderItemRequest(selectedProductId, quantity)
+                }
+            );
+            await OrdersApi.CreateAsync(request);
+            creating = false;
+            ordenes = await OrdersApi.GetAllAsync();
+            mensaje = "Orden guardada.";
+        }
+        catch
+        {
+            mensaje = "Error al guardar.";
+        }
+    }
+}
